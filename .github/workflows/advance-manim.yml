@@ -1,0 +1,108 @@
+name: Advance Manim Bot
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Override posting mode'
+        required: false
+        type: choice
+        options: [telegram, facebook]
+      topic:
+        description: 'Force specific topic'
+        required: false
+        type: choice
+        options: [kalkulus, aljabar_linear, geometri_3d, probstat]
+      complexity:
+        description: 'Complexity tier'
+        required: false
+        type: choice
+        options: [simple, medium, complex]
+        default: medium
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render-and-post:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+
+    env:
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      FB_ACCESS_TOKEN: ${{ secrets.FB_ACCESS_TOKEN }}
+      FB_PAGE_ID: ${{ secrets.FB_PAGE_ID }}
+      COMPLEXITY: ${{ inputs.complexity || 'medium' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: advance-manim-bot/requirements.txt
+
+      - name: Install system deps (Manim)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq \
+            ffmpeg \
+            libcairo2-dev \
+            libpango1.0-dev \
+            libgl1-mesa-glx \
+            libglib2.0-0 \
+            xvfb \
+            texlive-latex-base \
+            texlive-latex-extra \
+            texlive-fonts-extra \
+            texlive-fonts-recommended \
+            texlive-fonts-extra \
+            cm-super \
+            dvipng \
+            unzip \
+            curl
+
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r advance-manim-bot/requirements.txt
+
+      - name: Override mode (workflow_dispatch)
+        if: inputs.mode != ''
+        run: |
+          mkdir -p advance-manim-bot/data
+          echo '{"mode": "${{ inputs.mode }}", "last_update_id": 0}' > advance-manim-bot/data/mode.json
+
+      - name: Override topic (workflow_dispatch)
+        if: inputs.topic != ''
+        run: |
+          echo "COMPLEXITY=${{ inputs.complexity || 'medium' }}" >> $GITHUB_ENV
+          echo "FORCE_TOPIC=${{ inputs.topic }}" >> $GITHUB_ENV
+
+      - name: Run bot (with Xvfb for OpenGL fallback)
+        run: |
+          cd advance-manim-bot
+          mkdir -p data audio
+          xvfb-run -a python main.py
+        env:
+          COMPLEXITY: ${{ env.COMPLEXITY }}
+
+      - name: Commit history
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add advance-manim-bot/data/
+          git diff --staged --quiet || git commit -m "chore(bot): update history [skip ci]"
+          git push
