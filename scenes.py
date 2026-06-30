@@ -20,6 +20,38 @@ SCENE_COLORS = {
 }
 
 
+MAX_FRAME_WIDTH = 4.5
+CONTENT_WIDTH = 3.9
+BOTTOM_LIMIT = -3.0
+
+
+def wrap_text(text, max_width, font_size, font=""):
+    words = text.split()
+    if not words:
+        return []
+    lines = []
+    current = [words[0]]
+    for word in words[1:]:
+        test = Text(" ".join(current + [word]), font_size=font_size, font=font)
+        if test.width > max_width:
+            lines.append(" ".join(current))
+            current = [word]
+        else:
+            current.append(word)
+    if current:
+        lines.append(" ".join(current))
+    return lines
+
+
+def make_text_block(lines, font_size, color, max_width, **kwargs):
+    if not lines:
+        return None
+    texts = [Text(line, font_size=font_size, color=color, **kwargs) for line in lines]
+    block = VGroup(*texts)
+    block.arrange(DOWN, buff=0.08, aligned_edge=LEFT)
+    return block
+
+
 def get_topic_color(topic: str) -> str:
     return TOPIC_COLORS.get(topic, "#636E72")
 
@@ -66,30 +98,41 @@ class IntroScene(Scene):
         self.camera.background_color = colors["bg"]
 
         topic_color = get_topic_color(topic)
-        topic_label = Text(topic.replace("-", " ").title(), font_size=20, color=topic_color)
+        topic_lines = wrap_text(topic.replace("-", " ").title(), CONTENT_WIDTH, 20)
+        topic_label = Text(topic_lines[0], font_size=20, color=topic_color)
         topic_bg = RoundedRectangle(
-            width=topic_label.width + 0.6, height=topic_label.height + 0.2,
+            width=min(topic_label.width + 0.6, CONTENT_WIDTH + 0.4),
+            height=topic_label.height + 0.2,
             corner_radius=0.15, color=topic_color, fill_opacity=0.15, stroke_width=1,
         )
         topic_label.move_to(topic_bg.get_center())
         topic_group = VGroup(topic_bg, topic_label)
         topic_group.to_edge(UP, buff=0.5)
+        topic_group.set_x(0)
 
         tier_badge = Text(complexity.upper(), font_size=14, color=colors["accent"], weight=BOLD)
         tier_badge.next_to(topic_group, RIGHT, buff=0.3)
 
-        title = Text(judul, font_size=32, color=colors["main"], weight=BOLD)
-        title.next_to(topic_group, DOWN, buff=0.5)
+        title_lines = wrap_text(judul, CONTENT_WIDTH, 28)
+        title = make_text_block(title_lines, 28, colors["main"], CONTENT_WIDTH, weight=BOLD)
+        if title:
+            title.next_to(topic_group, DOWN, buff=0.5)
+            title.set_x(0)
 
         divider = Line(LEFT * 1.5, RIGHT * 1.5, color=colors["accent"], stroke_width=2)
-        divider.next_to(title, DOWN, buff=0.3)
+        if title:
+            divider.next_to(title, DOWN, buff=0.3)
+        else:
+            divider.next_to(topic_group, DOWN, buff=0.5)
+        divider.set_x(0)
 
         self.play(
             FadeIn(topic_group, scale=0.8),
             Write(tier_badge),
             run_time=0.8,
         )
-        self.play(Write(title), run_time=1.0)
+        if title:
+            self.play(Write(title), run_time=1.0)
         self.play(Create(divider), run_time=0.5)
 
         if data.get("character") and data["character"].get("appear"):
@@ -100,6 +143,8 @@ class IntroScene(Scene):
                 char.to_corner(DL, buff=0.5)
             else:
                 char.to_corner(DR, buff=0.5)
+            if char.get_center()[1] < BOTTOM_LIMIT:
+                char.set_y(BOTTOM_LIMIT)
             self.play(FadeIn(char, shift=UP * 0.3), run_time=0.5)
             self.add(char)
 
@@ -202,19 +247,19 @@ class VizScene(ThreeDScene):
 
     def _create_element_2d(self, el_name):
         if el_name == "title":
-            return Text("Visualization", font_size=28, color="#2D3436", weight=BOLD)
+            return Text("Visualization", font_size=24, color="#2D3436", weight=BOLD)
         elif el_name == "equation":
-            return MathTex("f(x) = x^2", font_size=36, color="#2D3436")
+            return MathTex("f(x) = x^2", font_size=28, color="#2D3436")
         elif el_name == "label":
-            return Text("Label", font_size=20, color="#636E72")
+            return Text("Label", font_size=18, color="#636E72")
         elif el_name == "number_line":
-            return NumberLine(x_range=[-3, 3, 1], length=8, include_numbers=True)
+            return NumberLine(x_range=[-3, 3, 1], length=CONTENT_WIDTH, include_numbers=True, font_size=18)
         elif el_name == "grid":
-            return NumberPlane()
+            return NumberPlane(x_range=[-3, 3], y_range=[-5, 5])
         elif el_name == "axes":
-            return Axes(x_range=[-3, 3, 1], y_range=[-3, 3, 1], axis_config={"include_numbers": True})
+            return Axes(x_range=[-2, 2, 1], y_range=[-2, 2, 1], x_length=CONTENT_WIDTH, y_length=3, axis_config={"include_numbers": True, "font_size": 16})
         elif el_name == "vector":
-            return Vector(RIGHT * 2, color="#E17055")
+            return Vector(RIGHT * 1.5, color="#E17055")
         else:
             return None
 
@@ -268,12 +313,20 @@ class ConclusionScene(Scene):
         summary_text.to_edge(UP, buff=1.0)
         self.play(Write(summary_text), run_time=0.8)
 
-        desc = Text(judul, font_size=24, color=colors["main"])
-        desc.next_to(summary_text, DOWN, buff=0.5)
-        self.play(FadeIn(desc, shift=UP), run_time=0.8)
+        desc_lines = wrap_text(judul, CONTENT_WIDTH, 22)
+        desc = make_text_block(desc_lines, 22, colors["main"], CONTENT_WIDTH)
+        if desc:
+            desc.next_to(summary_text, DOWN, buff=0.5)
+            desc.set_x(0)
+            if desc.get_center()[1] - desc.height / 2 < BOTTOM_LIMIT:
+                desc.set_y(BOTTOM_LIMIT + desc.height / 2)
+            self.play(FadeIn(desc, shift=UP), run_time=0.8)
 
         cta = Text("Follow untuk video matematika setiap hari!", font_size=18, color="#636E72")
-        cta.next_to(desc, DOWN, buff=0.4)
+        cta.next_to(desc if desc else summary_text, DOWN, buff=0.4)
+        cta.set_x(0)
+        if cta.get_center()[1] - cta.height / 2 < BOTTOM_LIMIT:
+            cta.set_y(BOTTOM_LIMIT + cta.height / 2)
         self.play(Write(cta), run_time=0.8)
 
         remaining = duration - 2.5
