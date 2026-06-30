@@ -122,6 +122,21 @@ class VizScene(ThreeDScene):
         else:
             self._build_2d_scene(elements, animations, duration, colors)
 
+    def _apply_animations(self, mobject, animations):
+        for anim_name in animations:
+            if anim_name == "write":
+                self.play(Write(mobject), run_time=1.5)
+            elif anim_name == "fade_in":
+                self.play(FadeIn(mobject), run_time=1.5)
+            elif anim_name == "create":
+                self.play(Create(mobject), run_time=1.5)
+            elif anim_name == "grow_from_center":
+                self.play(GrowFromCenter(mobject), run_time=1.5)
+            elif anim_name == "indicate":
+                self.play(Indicate(mobject), run_time=1.0)
+            else:
+                self.play(Write(mobject), run_time=1.5)
+
     def _build_2d_scene(self, elements, animations, duration, colors):
         mobjects = []
         for el in elements:
