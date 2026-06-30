@@ -45,13 +45,21 @@ def main():
         print(f"[STEP 2/7] Pick topic: {topic}, complexity: {complexity}")
 
         print("[STEP 3/7] Generate content via Gemini")
-        spec = generate(topic, complexity, history)
+        try:
+            spec = generate(topic, complexity, history)
+        except Exception as e:
+            notify_telegram(f"[GENERATE ERROR] Gemini gagal setelah 3 percobaan: {e}")
+            sys.exit(0)
         judul = spec["narasi"]["judul"]
         print(f"  Judul: {judul}")
 
         if is_duplicate(judul, history):
             print("[WARN] Duplicate judul detected, regenerating...")
-            spec = generate(topic, complexity, history)
+            try:
+                spec = generate(topic, complexity, history)
+            except Exception as e:
+                notify_telegram(f"[GENERATE ERROR] Regenerasi juga gagal: {e}")
+                sys.exit(0)
             judul = spec["narasi"]["judul"]
 
         print("[STEP 4/7] Build caption & compliance check")
@@ -118,9 +126,6 @@ def main():
         if tmpdir and os.path.exists(tmpdir):
             shutil.rmtree(tmpdir, ignore_errors=True)
         cleanup_cache()
-
-
-
 
 
 def cleanup_cache():
