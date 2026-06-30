@@ -16,5 +16,14 @@
     "mode": "telegram",
     "durasi_render": 14.1,
     "timestamp": "2026-06-30T16:27:55.576611"
+  },
+  {
+    "judul": "Geometri Permukaan Multivariabel",
+    "topik": "geometri-3d",
+    "complexity": "medium",
+    "tanggal": "2026-06-30",
+    "mode": "telegram",
+    "durasi_render": 15.9,
+    "timestamp": "2026-06-30T18:01:11.326169"
   }
 ]
