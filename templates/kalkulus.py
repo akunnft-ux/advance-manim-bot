@@ -77,7 +77,7 @@ class DerivativeScene(BaseTemplate):
         slope = 2 * x
         y = x**2
         dx = 1.0
-        line = axes.plot_line(
+        line = axes.plot(
             lambda v: slope * (v - x) + y,
             x_range=[x - dx, x + dx],
             color="#E17055",
