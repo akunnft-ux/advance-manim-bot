@@ -37,10 +37,10 @@ class SphereScene(BaseTemplate):
         )
 
         formula = MathTex(rumus, font_size=30, color="#4DABF7")
-        formula.add_fixed_in_frame_mobjects()
         formula.to_corner(UL, buff=0.4)
 
         self.play(Create(axes), Write(formula), run_time=1.2)
+        self.add_fixed_in_frame_mobjects(formula)
         self.play(Create(sphere), run_time=2.0)
 
         self.begin_ambient_camera_rotation(rate=0.3)
@@ -89,10 +89,10 @@ class CrossSectionScene(BaseTemplate):
         )
 
         formula = MathTex(rumus, font_size=30, color="#FF6B9D")
-        formula.add_fixed_in_frame_mobjects()
         formula.to_corner(UL, buff=0.4)
 
         self.play(Create(axes), Write(formula), run_time=1.2)
+        self.add_fixed_in_frame_mobjects(formula)
         self.play(Create(surface), run_time=2.0)
 
         self.begin_ambient_camera_rotation(rate=0.25)
