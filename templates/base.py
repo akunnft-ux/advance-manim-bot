@@ -20,6 +20,19 @@ TOPIC_COLORS = {
 class BaseTemplate(ThreeDScene):
     params = {}
     topic = ""
+    TIMING_MULTIPLIER = 1.3
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.camera.background_color = "#F8F9FA"
+
+    def play(self, *args, **kwargs):
+        if "run_time" in kwargs:
+            kwargs["run_time"] = kwargs["run_time"] * self.TIMING_MULTIPLIER
+        super().play(*args, **kwargs)
+
+    def wait(self, duration=1.0):
+        super().wait(duration * self.TIMING_MULTIPLIER)
 
     def get_topic_color(self):
         return TOPIC_COLORS.get(self.topic, "#0984E3")

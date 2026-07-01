@@ -21,9 +21,9 @@ class VectorScene(BaseTemplate):
             x_length=CONTENT_WIDTH,
             y_length=CONTENT_WIDTH,
             background_line_style={
-                "stroke_color": "#E0E0E0",
+                "stroke_color": "#B0B0B0",
                 "stroke_width": 1,
-                "stroke_opacity": 0.6,
+                "stroke_opacity": 0.5,
             },
             axis_config={"color": "#636E72", "font_size": 14, "include_numbers": True},
         )
