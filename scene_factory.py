@@ -3,48 +3,20 @@ import shutil
 import subprocess
 import tempfile
 import threading
-import time
-from typing import Optional
-
-from manim import config, tempconfig
+from manim import tempconfig
 
 from config import RENDER_TIMEOUT
-
-
-def _concat_scenes(scene_paths: list, output_path: str) -> str:
-    valid = [p for p in scene_paths if os.path.exists(p) and os.path.getsize(p) > 0]
-    if not valid:
-        raise RuntimeError("No valid scene files to concatenate")
-    if len(valid) == 1:
-        if valid[0] != output_path:
-            shutil.move(valid[0], output_path)
-        return output_path
-
-    tmpdir = tempfile.mkdtemp()
-    try:
-        filelist = os.path.join(tmpdir, "filelist.txt")
-        with open(filelist, "w") as f:
-            for p in valid:
-                f.write(f"file '{p}'\n")
-
-        subprocess.run(
-            ["ffmpeg", "-y", "-f", "concat", "-safe", "0",
-             "-i", filelist, "-c", "copy", output_path],
-            check=True, capture_output=True, text=True, timeout=120,
-        )
-        if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
-            return output_path
-        raise RuntimeError("FFmpeg concat produced empty output")
-    except (subprocess.CalledProcessError, subprocess.TimeoutExpired) as e:
-        raise RuntimeError(f"FFmpeg concat failed: {e}")
-    finally:
-        shutil.rmtree(tmpdir, ignore_errors=True)
+from templates import TEMPLATE_REGISTRY
 
 
 def render_scene(spec: dict, topic: str, complexity: str, output_path: str):
     narasi = spec["narasi"]
-    scenes_spec = spec["scenes"]
-    character = spec.get("character", None)
+    template_name = spec.get("template", "derivative")
+    user_params = spec.get("params", {})
+
+    template_class = TEMPLATE_REGISTRY.get(template_name)
+    if not template_class:
+        raise RuntimeError(f"Unknown template: {template_name}")
 
     base_config = {
         "quality": "medium_quality",
@@ -52,76 +24,33 @@ def render_scene(spec: dict, topic: str, complexity: str, output_path: str):
         "preview": False,
         "pixel_width": 1080,
         "pixel_height": 1920,
+        "frame_width": 4.5,
+        "frame_height": 8,
         "frame_rate": 24,
     }
 
-    tmpdir = tempfile.mkdtemp()
-    scene_paths = []
+    params = {
+        "rumus": narasi.get("rumus", ""),
+        "judul": narasi.get("judul", ""),
+        "deskripsi": narasi.get("deskripsi", ""),
+        "topic_label": topic.replace("-", " ").title(),
+        "complexity": complexity,
+        **user_params,
+    }
 
-    try:
-        for i, scene_spec in enumerate(scenes_spec):
-            scene_type = scene_spec["type"]
-            is_3d = scene_spec.get("3d", False)
+    with tempconfig({**base_config, "output_file": "template_scene"}):
+        instance = template_class()
+        instance.params = params
+        instance.topic = topic
+        instance.render()
 
-            scene_data = {
-                "judul": narasi["judul"],
-                "topic": topic,
-                "complexity": complexity,
-                "elements": scene_spec["elements"],
-                "animations": scene_spec["animations"],
-                "duration": scene_spec.get("duration", 6),
-                "camera": scene_spec.get("camera", None),
-                "3d": is_3d,
-                "character": character,
-            }
+    rendered = instance.renderer.file_writer.movie_file_path
+    if os.path.exists(rendered) and os.path.getsize(rendered) > 0:
+        if rendered != output_path:
+            shutil.move(rendered, output_path)
+        return output_path
 
-            if scene_type == "intro":
-                from scenes import IntroScene
-                scene_class = IntroScene
-            elif scene_type == "visualization":
-                from scenes import VizScene, VizScene2D
-                scene_class = VizScene if is_3d else VizScene2D
-            elif scene_type == "conclusion":
-                from scenes import ConclusionScene
-                scene_class = ConclusionScene
-            else:
-                from scenes import VizScene2D
-                scene_class = VizScene2D
-
-            with tempconfig({**base_config, "output_file": f"scene_{i}"}):
-                instance = scene_class()
-                instance.data = scene_data
-                instance.render()
-
-            rendered = instance.renderer.file_writer.movie_file_path
-            if os.path.exists(rendered) and os.path.getsize(rendered) > 0:
-                scene_paths.append(rendered)
-            else:
-                print(f"[WARN] Scene {i} rendered no output, skipping")
-
-        if not scene_paths:
-            raise RuntimeError("No scenes rendered successfully")
-
-        return _concat_scenes(scene_paths, output_path)
-
-    except Exception as e:
-        raise RuntimeError(f"Manim render failed: {e}")
-    finally:
-        shutil.rmtree(tmpdir, ignore_errors=True)
-        _cleanup_cache()
-
-
-def _cleanup_cache():
-    cache_dirs = [
-        os.path.expanduser("~/.ManimCache"),
-        os.path.expanduser("~/.cache/manim"),
-    ]
-    for d in cache_dirs:
-        if os.path.exists(d):
-            try:
-                shutil.rmtree(d, ignore_errors=True)
-            except Exception:
-                pass
+    raise RuntimeError(f"Template {template_name} produced no output")
 
 
 class RenderTimeoutError(Exception):
