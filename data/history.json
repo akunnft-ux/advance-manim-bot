@@ -34,5 +34,14 @@
     "mode": "telegram",
     "durasi_render": 16.9,
     "timestamp": "2026-07-01T11:31:30.986078"
+  },
+  {
+    "judul": "Misteri Distribusi Normal",
+    "topik": "probstat",
+    "complexity": "medium",
+    "tanggal": "2026-07-01",
+    "mode": "telegram",
+    "durasi_render": 16.6,
+    "timestamp": "2026-07-01T14:39:27.987033"
   }
 ]
