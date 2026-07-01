@@ -25,5 +25,14 @@
     "mode": "telegram",
     "durasi_render": 15.9,
     "timestamp": "2026-06-30T18:01:11.326169"
+  },
+  {
+    "judul": "Intuisi Eigenvalue dan Eigenvektor",
+    "topik": "aljabar-linear",
+    "complexity": "medium",
+    "tanggal": "2026-07-01",
+    "mode": "telegram",
+    "durasi_render": 16.9,
+    "timestamp": "2026-07-01T11:31:30.986078"
   }
 ]
