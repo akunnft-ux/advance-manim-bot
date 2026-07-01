@@ -61,5 +61,14 @@
     "mode": "telegram",
     "durasi_render": 49.3,
     "timestamp": "2026-07-01T15:28:35.586426"
+  },
+  {
+    "judul": "Geometri Transformasi Matriks",
+    "topik": "aljabar-linear",
+    "complexity": "medium",
+    "tanggal": "2026-07-01",
+    "mode": "telegram",
+    "durasi_render": 17.1,
+    "timestamp": "2026-07-01T15:56:17.143146"
   }
 ]
