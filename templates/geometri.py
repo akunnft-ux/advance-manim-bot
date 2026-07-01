@@ -16,6 +16,7 @@ class SphereScene(BaseTemplate):
         )
 
         intro_group = self.intro_phase(judul, topic_label)
+        self.add_fixed_in_frame_mobjects(*intro_group)
         self.fade_out_group(intro_group)
 
         self.set_camera_orientation(
@@ -51,6 +52,7 @@ class SphereScene(BaseTemplate):
         self.fade_out_group(vis_group)
 
         conc_group = self.conclusion_phase(judul, p.get("deskripsi", ""))
+        self.add_fixed_in_frame_mobjects(*conc_group)
         self.wait(1.5)
 
 
@@ -66,6 +68,7 @@ class CrossSectionScene(BaseTemplate):
         )
 
         intro_group = self.intro_phase(judul, topic_label)
+        self.add_fixed_in_frame_mobjects(*intro_group)
         self.fade_out_group(intro_group)
 
         self.set_camera_orientation(
@@ -103,4 +106,5 @@ class CrossSectionScene(BaseTemplate):
         self.fade_out_group(vis_group)
 
         conc_group = self.conclusion_phase(judul, p.get("deskripsi", ""))
+        self.add_fixed_in_frame_mobjects(*conc_group)
         self.wait(1.5)
