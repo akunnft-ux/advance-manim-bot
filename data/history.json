@@ -52,5 +52,14 @@
     "mode": "telegram",
     "durasi_render": 36.5,
     "timestamp": "2026-07-01T15:03:34.431807"
+  },
+  {
+    "judul": "Esensi Integral: Luas di Bawah Kurva",
+    "topik": "kalkulus",
+    "complexity": "simple",
+    "tanggal": "2026-07-01",
+    "mode": "telegram",
+    "durasi_render": 49.3,
+    "timestamp": "2026-07-01T15:28:35.586426"
   }
 ]
