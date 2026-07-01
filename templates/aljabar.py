@@ -10,10 +10,8 @@ class VectorScene(BaseTemplate):
         rumus = p.get("rumus", "\\vec{a} + \\vec{b}")
         judul = p.get("judul", "Penjumlahan Vektor")
         topic_label = p.get("topic_label", "Aljabar Linear")
-        complexity = p.get("complexity", "medium")
 
-        intro_group = self.intro_phase(judul, topic_label, complexity)
-        self.section_break(0.5)
+        intro_group = self.intro_phase(judul, topic_label)
         self.fade_out_group(intro_group)
 
         # ————— Plane + Vectors —————
@@ -66,23 +64,23 @@ class VectorScene(BaseTemplate):
         sum_formula.to_edge(UP, buff=0.8)
         sum_formula.set_x(0)
 
-        self.play(Create(plane), run_time=0.8)
-        self.play(Write(sum_formula), run_time=0.6)
+        self.play(Create(plane), run_time=1.2)
+        self.play(Write(sum_formula), run_time=1.0)
 
-        self.play(GrowArrow(v1_vec), Write(v1_label), run_time=0.8)
-        self.play(GrowArrow(v2_vec), Write(v2_label), run_time=0.8)
+        self.play(GrowArrow(v1_vec), Write(v1_label), run_time=1.2)
+        self.play(GrowArrow(v2_vec), Write(v2_label), run_time=1.2)
 
         v2_shift = v2_vec.copy()
-        self.play(v2_shift.animate.shift(v1_vec.get_end()), run_time=0.6)
+        self.play(v2_shift.animate.shift(v1_vec.get_end()), run_time=1.0)
 
-        self.play(GrowArrow(v_sum), Write(sum_label), run_time=0.8)
-        self.section_break(0.5)
+        self.play(GrowArrow(v_sum), Write(sum_label), run_time=1.2)
+        self.section_break()
 
         vis_group = VGroup(plane, v1_vec, v2_vec, v_sum, v1_label, v2_label, sum_label, sum_formula, v2_shift)
         self.fade_out_group(vis_group)
 
         conc_group = self.conclusion_phase(judul, p.get("deskripsi", ""))
-        self.wait(1.0)
+        self.wait(1.5)
 
 
 class TransformScene(BaseTemplate):
@@ -91,10 +89,8 @@ class TransformScene(BaseTemplate):
         rumus = p.get("rumus", "\\begin{pmatrix}1 & 2\\\\3 & 1\\end{pmatrix}")
         judul = p.get("judul", "Transformasi Linear")
         topic_label = p.get("topic_label", "Aljabar Linear")
-        complexity = p.get("complexity", "medium")
 
-        intro_group = self.intro_phase(judul, topic_label, complexity)
-        self.section_break(0.5)
+        intro_group = self.intro_phase(judul, topic_label)
         self.fade_out_group(intro_group)
 
         # ————— Grid transformation —————
@@ -118,9 +114,8 @@ class TransformScene(BaseTemplate):
         matrix.to_edge(UP, buff=0.8)
         matrix.set_x(0)
 
-        self.play(Create(plane), Write(matrix), run_time=1.0)
+        self.play(Create(plane), Write(matrix), run_time=1.5)
 
-        # Transform: scale + shear
         transform_matrix = np.array([[1.5, 0.8], [0.5, 1.2]])
         new_plane = plane.copy()
         new_plane.apply_matrix(transform_matrix)
@@ -129,18 +124,17 @@ class TransformScene(BaseTemplate):
 
         self.play(
             Transform(plane, new_plane),
-            run_time=2.0,
+            run_time=3.0,
         )
 
         label = Text("Grid setelah transformasi", font_size=20, color="#E17055")
         label.next_to(plane, DOWN, buff=0.3)
         label.set_x(0)
         self.clamp_to_safe(label)
-        self.play(Write(label), run_time=0.5)
+        self.play(Write(label), run_time=0.8)
 
         vis_group = VGroup(plane, matrix, label)
-        self.section_break(0.5)
         self.fade_out_group(vis_group)
 
         conc_group = self.conclusion_phase(judul, p.get("deskripsi", ""))
-        self.wait(1.0)
+        self.wait(1.5)

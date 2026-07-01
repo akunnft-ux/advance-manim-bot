@@ -10,11 +10,9 @@ class DerivativeScene(BaseTemplate):
         rumus = p.get("rumus", "f(x) = x^2")
         judul = p.get("judul", "Turunan Fungsi")
         topic_label = p.get("topic_label", "Kalkulus")
-        complexity = p.get("complexity", "medium")
 
         # ————— Intro —————
-        intro_group = self.intro_phase(judul, topic_label, complexity)
-        self.section_break(0.5)
+        intro_group = self.intro_phase(judul, topic_label)
         self.fade_out_group(intro_group)
 
         # ————— Visualization: Function + Tangent —————
@@ -29,7 +27,6 @@ class DerivativeScene(BaseTemplate):
         axes.set_y(0.3)
 
         func_color = self.get_topic_color()
-        tan_color = "#E17055"
 
         graph = axes.plot(
             lambda x: x**2,
@@ -44,9 +41,9 @@ class DerivativeScene(BaseTemplate):
         if graph_label.get_center()[1] + graph_label.height / 2 > 3.5:
             graph_label.set_y(3.5 - graph_label.height / 2)
 
-        self.play(Create(axes), run_time=0.8)
-        self.play(Write(graph_label), run_time=0.6)
-        self.play(Create(graph), run_time=1.0)
+        self.play(Create(axes), run_time=1.2)
+        self.play(Write(graph_label), run_time=1.0)
+        self.play(Create(graph), run_time=1.5)
 
         # Tangent line with ValueTracker
         t = ValueTracker(-1.8)
@@ -54,7 +51,7 @@ class DerivativeScene(BaseTemplate):
         dot = always_redraw(
             lambda: Dot(
                 axes.c2p(t.get_value(), t.get_value() ** 2),
-                color=tan_color,
+                color="#E17055",
                 radius=0.06,
             )
         )
@@ -62,18 +59,17 @@ class DerivativeScene(BaseTemplate):
             lambda: self._get_tangent(axes, t.get_value())
         )
 
-        self.play(FadeIn(dot), Create(tangent), run_time=0.6)
+        self.play(FadeIn(dot), Create(tangent), run_time=1.0)
 
         # Slide tangent across the curve
-        self.play(t.animate.set_value(1.8), run_time=3.0, rate_func=there_and_back)
+        self.play(t.animate.set_value(1.8), run_time=4.0, rate_func=there_and_back)
 
         vis_group = VGroup(axes, graph, graph_label, dot, tangent)
-        self.section_break(0.5)
         self.fade_out_group(vis_group)
 
         # ————— Conclusion —————
         conc_group = self.conclusion_phase(judul, p.get("deskripsi", ""))
-        self.wait(1.0)
+        self.wait(1.5)
 
     def _get_tangent(self, axes, x):
         if abs(x) < 0.01:
@@ -96,11 +92,9 @@ class IntegralScene(BaseTemplate):
         rumus = p.get("rumus", "\\int_{0}^{2} x^2 \\, dx")
         judul = p.get("judul", "Integral Tentu")
         topic_label = p.get("topic_label", "Kalkulus")
-        complexity = p.get("complexity", "medium")
 
         # ————— Intro —————
-        intro_group = self.intro_phase(judul, topic_label, complexity)
-        self.section_break(0.5)
+        intro_group = self.intro_phase(judul, topic_label)
         self.fade_out_group(intro_group)
 
         # ————— Visualization: Riemann rectangles —————
@@ -115,7 +109,6 @@ class IntegralScene(BaseTemplate):
         axes.set_y(0.3)
 
         color = self.get_topic_color()
-        fill_color = color + "55"
         n = ValueTracker(4)
 
         graph = axes.plot(
@@ -133,29 +126,28 @@ class IntegralScene(BaseTemplate):
             lambda: MathTex(f"n = {int(n.get_value())}", font_size=22, color="#636E72").to_corner(UR, buff=0.3)
         )
 
-        self.play(Create(axes), run_time=0.8)
-        self.play(Create(graph), run_time=0.8)
-        self.play(FadeIn(riemann), run_time=0.6)
-        self.play(Write(n_label), run_time=0.3)
+        self.play(Create(axes), run_time=1.2)
+        self.play(Create(graph), run_time=1.2)
+        self.play(FadeIn(riemann), run_time=1.0)
+        self.play(Write(n_label), run_time=0.5)
 
         # Animate increasing rectangle count
-        self.play(n.animate.set_value(12), run_time=2.0)
-        self.play(n.animate.set_value(24), run_time=1.5)
-        self.play(n.animate.set_value(50), run_time=1.5)
+        self.play(n.animate.set_value(12), run_time=2.5)
+        self.play(n.animate.set_value(24), run_time=2.0)
+        self.play(n.animate.set_value(50), run_time=2.0)
 
         formula = MathTex(rumus, font_size=30, color=color)
         formula.next_to(axes, DOWN, buff=0.3)
         formula.set_x(0)
         self.clamp_to_safe(formula)
-        self.play(Write(formula), run_time=0.8)
+        self.play(Write(formula), run_time=1.0)
 
         vis_group = VGroup(axes, graph, riemann, n_label, formula)
-        self.section_break(0.5)
         self.fade_out_group(vis_group)
 
         # ————— Conclusion —————
         conc_group = self.conclusion_phase(judul, p.get("deskripsi", ""))
-        self.wait(1.0)
+        self.wait(1.5)
 
     def _get_rectangles(self, axes, n):
         if n < 1:

@@ -10,13 +10,12 @@ class SphereScene(BaseTemplate):
         rumus = p.get("rumus", "x^2 + y^2 + z^2 = r^2")
         judul = p.get("judul", "Geometri Bola")
         topic_label = p.get("topic_label", "Geometri 3D")
-        complexity = p.get("complexity", "medium")
 
         self.set_camera_orientation(
             phi=70 * DEGREES, theta=-45 * DEGREES, distance=7
         )
 
-        intro_group = self.intro_phase(judul, topic_label, complexity)
+        intro_group = self.intro_phase(judul, topic_label)
         self.fade_out_group(intro_group)
 
         self.set_camera_orientation(
@@ -41,20 +40,18 @@ class SphereScene(BaseTemplate):
         formula.add_fixed_in_frame_mobjects()
         formula.to_corner(UL, buff=0.4)
 
-        self.play(Create(axes), Write(formula), run_time=0.8)
-        self.play(Create(sphere), run_time=1.5)
-        self.section_break(0.5)
+        self.play(Create(axes), Write(formula), run_time=1.2)
+        self.play(Create(sphere), run_time=2.0)
 
         self.begin_ambient_camera_rotation(rate=0.3)
-        self.wait(3.0)
+        self.wait(4.0)
         self.stop_ambient_camera_rotation()
 
         vis_group = VGroup(axes, sphere, formula)
         self.fade_out_group(vis_group)
-        self.wait(0.3)
 
         conc_group = self.conclusion_phase(judul, p.get("deskripsi", ""))
-        self.wait(1.0)
+        self.wait(1.5)
 
 
 class CrossSectionScene(BaseTemplate):
@@ -63,13 +60,12 @@ class CrossSectionScene(BaseTemplate):
         rumus = p.get("rumus", "z = x^2 + y^2")
         judul = p.get("judul", "Irisan Bidang 3D")
         topic_label = p.get("topic_label", "Geometri 3D")
-        complexity = p.get("complexity", "medium")
 
         self.set_camera_orientation(
             phi=65 * DEGREES, theta=-30 * DEGREES, distance=8
         )
 
-        intro_group = self.intro_phase(judul, topic_label, complexity)
+        intro_group = self.intro_phase(judul, topic_label)
         self.fade_out_group(intro_group)
 
         self.set_camera_orientation(
@@ -96,18 +92,15 @@ class CrossSectionScene(BaseTemplate):
         formula.add_fixed_in_frame_mobjects()
         formula.to_corner(UL, buff=0.4)
 
-        self.play(Create(axes), Write(formula), run_time=0.8)
-        self.play(Create(surface), run_time=1.5)
-        self.section_break(0.5)
+        self.play(Create(axes), Write(formula), run_time=1.2)
+        self.play(Create(surface), run_time=2.0)
 
-        # Rotate to show
         self.begin_ambient_camera_rotation(rate=0.25)
-        self.wait(3.0)
+        self.wait(4.0)
         self.stop_ambient_camera_rotation()
 
         vis_group = VGroup(axes, surface, formula)
         self.fade_out_group(vis_group)
-        self.wait(0.3)
 
         conc_group = self.conclusion_phase(judul, p.get("deskripsi", ""))
-        self.wait(1.0)
+        self.wait(1.5)

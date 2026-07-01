@@ -84,43 +84,39 @@ class BaseTemplate(ThreeDScene):
         c = color or self.get_topic_color()
         return Line(LEFT * width / 2, RIGHT * width / 2, color=c, stroke_width=2)
 
-    def fade_in_group(self, group, run_time=1.0):
+    def fade_in_group(self, group, run_time=1.5):
         self.play(FadeIn(group, scale=0.9), run_time=run_time)
 
-    def fade_out_group(self, group, run_time=0.5):
+    def fade_out_group(self, group, run_time=1.0):
         self.play(FadeOut(group), run_time=run_time)
 
     def show_math(self, latex, font_size=36, color="#2D3436"):
         return MathTex(latex, font_size=font_size, color=color)
 
-    def section_break(self, duration=0.5):
+    def section_break(self, duration=1.0):
         self.wait(duration)
 
-    def intro_phase(self, judul, topic_label, complexity="medium"):
+    def intro_phase(self, judul, topic_label):
         badge = self.make_topic_badge(topic_label)
-        self.play(FadeIn(badge, scale=0.8), run_time=0.6)
-
-        tier = Text(complexity.upper(), font_size=14, color=self.get_topic_color(), weight=BOLD)
-        tier.next_to(badge, RIGHT, buff=0.2)
-        self.play(Write(tier), run_time=0.3)
+        self.play(FadeIn(badge, scale=0.8), run_time=1.0)
 
         title = self.make_heading(judul, font_size=28, color="#2D3436")
         title.next_to(badge, DOWN, buff=0.4)
         title.set_x(0)
         self.clamp_to_safe(title, top=badge.get_bottom()[1] - 0.2)
-        self.play(Write(title), run_time=0.8)
+        self.play(Write(title), run_time=1.2)
 
         divider = self.make_divider()
         divider.next_to(title, DOWN, buff=0.3)
         divider.set_x(0)
-        self.play(Create(divider), run_time=0.4)
+        self.play(Create(divider), run_time=0.8)
 
-        return VGroup(badge, tier, title, divider)
+        return VGroup(badge, title, divider)
 
     def conclusion_phase(self, judul, deskripsi=""):
         heading = Text("Kesimpulan", font_size=28, color=self.get_topic_color(), weight=BOLD)
         heading.to_edge(UP, buff=1.0)
-        self.play(Write(heading), run_time=0.6)
+        self.play(Write(heading), run_time=1.0)
 
         lines = self._wrap(judul, CONTENT_WIDTH, 22)
         texts = [Text(line, font_size=22, color="#2D3436") for line in lines]
@@ -129,22 +125,13 @@ class BaseTemplate(ThreeDScene):
         block.next_to(heading, DOWN, buff=0.4)
         block.set_x(0)
         self.clamp_to_safe(block)
-        self.play(FadeIn(block, shift=UP * 0.2), run_time=0.6)
+        self.play(FadeIn(block, shift=UP * 0.2), run_time=1.0)
 
         if deskripsi:
             desc_text = self.make_label(deskripsi, font_size=18, color="#636E72")
             desc_text.next_to(block, DOWN, buff=0.3)
             desc_text.set_x(0)
             self.clamp_to_safe(desc_text)
-            self.play(Write(desc_text), run_time=0.6)
-        else:
-            desc_text = None
+            self.play(Write(desc_text), run_time=1.0)
 
-        cta = Text("Follow untuk video matematika setiap hari!", font_size=16, color="#636E72")
-        last = desc_text if desc_text else block
-        cta.next_to(last, DOWN, buff=0.3)
-        cta.set_x(0)
-        self.clamp_to_safe(cta)
-        self.play(Write(cta), run_time=0.5)
-
-        return VGroup(heading, block, cta)
+        return VGroup(heading, block)

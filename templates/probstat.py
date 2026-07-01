@@ -14,10 +14,8 @@ class DistribusiScene(BaseTemplate):
         rumus = p.get("rumus", "f(x) = \\frac{1}{\\sigma\\sqrt{2\\pi}} e^{-\\frac{(x-\\mu)^2}{2\\sigma^2}}")
         judul = p.get("judul", "Distribusi Normal")
         topic_label = p.get("topic_label", "Probabilitas & Statistika")
-        complexity = p.get("complexity", "medium")
 
-        intro_group = self.intro_phase(judul, topic_label, complexity)
-        self.section_break(0.5)
+        intro_group = self.intro_phase(judul, topic_label)
         self.fade_out_group(intro_group)
 
         # ————— Normal distribution curve —————
@@ -53,14 +51,14 @@ class DistribusiScene(BaseTemplate):
         if formula.get_center()[1] + formula.height / 2 > 3.5:
             formula.set_y(3.5 - formula.height / 2)
 
-        self.play(Create(axes), run_time=0.8)
-        self.play(Write(formula), run_time=0.8)
-        self.play(Create(graph), run_time=1.0)
-        self.play(FadeIn(fill), run_time=0.6)
+        self.play(Create(axes), run_time=1.2)
+        self.play(Write(formula), run_time=1.0)
+        self.play(Create(graph), run_time=1.5)
+        self.play(FadeIn(fill), run_time=1.0)
 
         label_68 = MathTex("68\\%", font_size=26, color=color)
         label_68.move_to(axes.c2p(0, 0.15))
-        self.play(Write(label_68), run_time=0.4)
+        self.play(Write(label_68), run_time=0.6)
 
         # Add second filled area
         fill2 = axes.get_area(
@@ -70,17 +68,16 @@ class DistribusiScene(BaseTemplate):
             opacity=0.15,
         )
 
-        self.play(Transform(fill, fill2), run_time=0.8)
+        self.play(Transform(fill, fill2), run_time=1.2)
         label_95 = MathTex("95\\%", font_size=26, color=color)
         label_95.move_to(axes.c2p(0, 0.1))
-        self.play(Transform(label_68, label_95), run_time=0.4)
+        self.play(Transform(label_68, label_95), run_time=0.6)
 
         vis_group = VGroup(axes, graph, fill, formula, label_68)
-        self.section_break(0.5)
         self.fade_out_group(vis_group)
 
         conc_group = self.conclusion_phase(judul, p.get("deskripsi", ""))
-        self.wait(1.0)
+        self.wait(1.5)
 
 
 class BayesScene(BaseTemplate):
@@ -89,10 +86,8 @@ class BayesScene(BaseTemplate):
         rumus = p.get("rumus", "P(A|B) = \\frac{P(B|A)P(A)}{P(B)}")
         judul = p.get("judul", "Teorema Bayes")
         topic_label = p.get("topic_label", "Probabilitas & Statistika")
-        complexity = p.get("complexity", "medium")
 
-        intro_group = self.intro_phase(judul, topic_label, complexity)
-        self.section_break(0.5)
+        intro_group = self.intro_phase(judul, topic_label)
         self.fade_out_group(intro_group)
 
         # ————— Venn-like probability visualization —————
@@ -123,15 +118,14 @@ class BayesScene(BaseTemplate):
         formula.to_edge(UP, buff=0.8)
         formula.set_x(0)
 
-        self.play(Create(outer), run_time=0.4)
-        self.play(Create(a_circle), Write(a_label), run_time=0.8)
-        self.play(Create(b_circle), Write(b_label), run_time=0.8)
-        self.play(FadeIn(intersection), Write(inter_label), run_time=0.6)
-        self.play(Write(formula), run_time=0.8)
+        self.play(Create(outer), run_time=0.6)
+        self.play(Create(a_circle), Write(a_label), run_time=1.2)
+        self.play(Create(b_circle), Write(b_label), run_time=1.2)
+        self.play(FadeIn(intersection), Write(inter_label), run_time=1.0)
+        self.play(Write(formula), run_time=1.0)
 
         vis_group = VGroup(outer, a_circle, b_circle, intersection, a_label, b_label, inter_label, formula)
-        self.section_break(0.5)
         self.fade_out_group(vis_group)
 
         conc_group = self.conclusion_phase(judul, p.get("deskripsi", ""))
-        self.wait(1.0)
+        self.wait(1.5)
