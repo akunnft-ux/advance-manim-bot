@@ -17,7 +17,7 @@ TOPIC_COLORS = {
 }
 
 
-class BaseTemplate(Scene):
+class BaseTemplate(ThreeDScene):
     params = {}
     topic = ""
 
