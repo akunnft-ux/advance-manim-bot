@@ -79,5 +79,14 @@
     "mode": "telegram",
     "durasi_render": 19.4,
     "timestamp": "2026-07-01T16:17:19.257871"
+  },
+  {
+    "judul": "Memahami Distribusi Binomial",
+    "topik": "probstat",
+    "complexity": "medium",
+    "tanggal": "2026-07-01",
+    "mode": "telegram",
+    "durasi_render": 20.6,
+    "timestamp": "2026-07-01T18:02:09.056562"
   }
 ]
